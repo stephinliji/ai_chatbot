@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot (Flask + Mistral)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 700px;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            overflow: hidden; /* Ensures children don't overflow rounded corners */
+        }
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 70vh; /* Limit height to allow scrolling */
+            border-bottom: 1px solid #eee;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.5;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto; /* Aligns to the right */
+            border-bottom-right-radius: 5px;
+        }
+        .assistant-message {
+            background-color: #e9e9eb;
+            color: #333;
+            margin-right: auto; /* Aligns to the left */
+            border-bottom-left-radius: 5px;
+        }
+        .message .role {
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-bottom: 3px;
+            color: #777;
+        }
+        .user-message .role {
+            color: #d1e7ff;
+        }
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+        .chat-input button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s;
+        }
+        .chat-input button:hover {
+            background-color: #0056b3;
+        }
+        .empty-chat {
+            text-align: center;
+            color: #777;
+            padding: 30px;
+        }
+         /* Small footer for credits */
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            AI Chatbot (Mistral 7B Instruct)
+        </div>
+        <div class="chat-box" id="chatBox">
+            {% if chat_history %}
+                {% for message in chat_history %}
+                    <div class="message {% if message.role == 'user' %}user-message{% else %}assistant-message{% endif %}">
+                        {{ message.content|safe }} {# Using |safe if your content might have HTML, otherwise not needed #}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-chat">No messages yet. Start the conversation!</p>
+            {% endif %}
+        </div>
+        <form method="POST" action="{{ url_for('chat') }}" class="chat-input">
+            <input type="text" name="message" placeholder="Type your message..." autocomplete="off" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+     <div class="footer">
+        Powered by Flask & Hugging Face Inference API
+    </div>
+
+    <script>
+        // Auto-scroll to the bottom of the chat box
+        var chatBox = document.getElementById('chatBox');
+        if (chatBox) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
